@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINH ĐẸP TRAI</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007bff">
+    <style>
+        :root { --primary: #007bff; --success: #28a745; --dark: #2d3436; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 1400px; margin: auto; }
+        
+        .controls { 
+            background: white; padding: 25px; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            position: sticky; top: 15px; z-index: 1000;
+            border: 1px solid #e1e4e8;
+        }
+        .grid-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .formula-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed #ced4da; grid-column: 1 / -1; display: flex; gap: 15px; flex-wrap: wrap; }
+        .formula-group > div { flex: 1; min-width: 150px; }
+        
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+        .preview-item { background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; transition: transform 0.2s; }
+        .preview-item:hover { transform: translateY(-5px); }
+        
+        canvas { max-width: 100%; height: auto; border-radius: 6px; background: #f0f0f0; border: 1px solid #ddd; }
+        label { font-weight: 600; font-size: 0.85rem; color: #636e72; display: block; margin-bottom: 8px; text-transform: uppercase; }
+        input, select, button { width: 100%; padding: 10px; border: 1.5px solid #dfe6e9; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; }
+        input[type="range"] { padding: 5px 0; }
+        
+        #downloadBtn { background: var(--success); color: white; font-weight: bold; border: none; margin-top: 20px; cursor: pointer; font-size: 1rem; padding: 15px; transition: opacity 0.3s; }
+        #downloadBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { text-align: center; margin-top: 15px; font-weight: bold; color: var(--primary); font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="controls">
+        <div class="grid-settings">
+            <div>
+                <label>1. Tải ảnh lên</label>
+                <input type="file" id="upload" accept="image/*" multiple>
+            </div>
+            <div>
+                <label>2. Nhà cung cấp</label>
+                <select id="supplier">
+                    <option value="1A801">lan tùng (1A801)</option>
+                    <option value="1A802">khải kiệt (1A802)</option>
+                    <option value="1A803">alan (1A803)</option>
+                    <option value="1A804">a chu (1A804)</option>
+                    <option value="1A805">a sần (1A805)</option>
+                    <option value="1A806">a minh (1A806)</option>
+                    <option value="1A807">a tang (1A807)</option>
+                    <option value="1A808">a tâu (1A808)</option>
+                    <option value="1A809">a lý (1A809)</option>
+                    <option value="1A810">a hồng (1A810)</option>
+                    <option value="1A811">a sinh (1A811)</option>
+                    <option value="1A812">a long (1A812)</option>
+                    <option value="1A813">sanly (1A813)</option>
+                    <option value="1A814">sinh ủng (1A814)</option>
+                    <option value="1A815">mây già (1A815)</option>
+                    <option value="1A816">a ly (1A816)</option>
+                    <option value="1A817">a chung (1A817)</option>
+                    <option value="1A818">a bình (1A818)</option>
+                    <option value="1A819">seo hoàng (1A819)</option>
+                    <option value="1A820">a linh (1A820)</option>
+                    <option value="1A821">mongmanh (1A821)</option>
+                    <option value="1A822">a chân (1A822)</option>
+                    <option value="1A823">seo hoàng già (1A823)</option>
+                    <option value="1A824">a hỷ (1A824)</option>
+                    <option value="1A825">a vũ (1A825)</option>
+                    <option value="1A826">hoa túi (1A826)</option>
+                    <option value="1A827">a văn - a hoa (1A827)</option>
+                    <option value="1A828">mây trẻ (1A828)</option>
+                    <option value="1A829">khải béo (1A829)</option>
+                    <option value="1A830">a sinh nam (1A830)</option>
+                </select>
+            </div>
+            <div>
+                <label>3. Màu & Vị trí</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="color" id="textColor" value="#ffffff" style="width: 60px; padding: 2px;">
+                    <select id="textPos">
+                        <option value="top-left">Trái - Trên</option>
+                        <option value="bottom-right" selected>Phải - Dưới</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label>4. Cỡ chữ & Mờ</label>
+                <input type="range" id="textSize" min="1" max="20" value="7">
+                <input type="range" id="textOpacity" min="1" max="10" value="10">
+            </div>
+            <div>
+                <label>5. Chất lượng nén</label>
+                <input type="range" id="quality" min="10" max="100" value="80">
+            </div>
+            
+            <div>
+                <label>7. Mã ghi đè (Tùy chọn)</label>
+                <input type="text" id="overrideName" placeholder="VD: 15b (Bỏ trống dùng tên gốc)" style="border-color: var(--primary);">
+            </div>
+
+            <div class="formula-group">
+                <div>
+                    <label>Giá trung (NDT)</label>
+                    <input type="number" id="giaTrung" value="3.9" step="0.1" style="color: var(--primary); font-weight: bold;">
+                </div>
+                <div>
+                    <label>Người lớn (L)</label>
+                    <input type="number" id="giaNguoiLon" value="17" step="1" style="color: #d63031; font-weight: bold;">
+                </div>
+                <div>
+                    <label>Trẻ con (B)</label>
+                    <input type="number" id="giaTreEm" value="15" step="1" style="color: #0984e3; font-weight: bold;">
+                </div>
+                <div>
+                    <label>Chi phí thêm</label>
+                    <input type="number" id="extraPrice" value="0" step="1" style="color: var(--success); font-weight: bold;">
+                </div>
+            </div>
+        </div>
+
+        <button id="downloadBtn">XUẤT & TẢI ẢNH HÀNG LOẠT</button>
+        <div id="status" class="status">Sẵn sàng</div>
+    </div>
+
+    <div id="previewGrid" class="preview-grid"></div>
+</div>
+
+<script>
+    const $ = id => document.getElementById(id);
+    const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
+    
+    // Thêm 'overrideName' vào danh sách theo dõi thay đổi
+    const configIds = [
+        'supplier', 'textColor', 'textSize', 'textPos', 'textOpacity', 'quality', 
+        'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'overrideName'
+    ];
+    
+    let fileData = [];
+
+    // --- LOGIC TÍNH GIÁ MỚI ---
+    function calculateFinalPrice(filename, config) {
+        // Ưu tiên dùng tên ghi đè nếu có, ngược lại dùng tên file
+        const sourceName = config.overrideName ? config.overrideName : filename;
+        const match = sourceName.match(/^(\d+)([blBL])/); 
+        
+        if (match) {
+            const number = parseFloat(match[1]); 
+            const type = match[2].toLowerCase(); 
+            
+            let finalPrice = 0;
+            const baseCost = number * config.giaTrung; 
+
+            if (type === 'l') {
+                finalPrice = baseCost + config.giaNguoiLon + config.extraPrice;
+            } else if (type === 'b') {
+                finalPrice = baseCost + config.giaTreEm + config.extraPrice;
+            }
+
+            return Math.round(finalPrice) + "k";
+        }
+        
+        // Trả về chuỗi gốc nếu không khớp định dạng
+        return sourceName.split(/[\s._-]/)[0]; 
+    }
+
+    function getFormattedDate() {
+        const now = new Date();
+        let hh = now.getHours();
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ampm = hh >= 12 ? 'pm' : 'am';
+        hh = hh % 12 || 12;
+        return `${hh}:${mm}${ampm} ${now.getDate()}/${now.getMonth() + 1}`;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const idx = entry.target.dataset.index;
+                const canvas = entry.target.querySelector('canvas');
+                if (!canvas.dataset.rendered) render(idx, canvas);
+            }
+        });
+    }, { rootMargin: '300px' });
+
+    upload.onchange = (e) => {
+        fileData = Array.from(e.target.files);
+        previewGrid.innerHTML = "";
+        fileData.forEach((file, i) => {
+            const card = document.createElement('div');
+            card.className = 'preview-item';
+            card.dataset.index = i;
+            card.innerHTML = `<canvas></canvas><div style="font-size:11px; color:#666; margin-top:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${file.name}</div>`;
+            previewGrid.appendChild(card);
+            observer.observe(card);
+        });
+        status.innerText = `Đã tải lên ${fileData.length} ảnh.`;
+    };
+
+    configIds.forEach(id => {
+        const element = $(id);
+        if (element) {
+            element.oninput = () => {
+                document.querySelectorAll('.preview-item').forEach(item => {
+                    const canvas = item.querySelector('canvas');
+                    delete canvas.dataset.rendered;
+                    if (item.getBoundingClientRect().top < window.innerHeight) {
+                        render(item.dataset.index, canvas);
+                    }
+                });
+            };
+        }
+    });
+
+    async function render(index, canvas) {
+        const file = fileData[index];
+        const img = await loadImage(file);
+        
+        const config = {
+            supplier: $('supplier').value,
+            color: $('textColor').value,
+            sizeRatio: $('textSize').value / 100,
+            pos: $('textPos').value,
+            opacity: $('textOpacity').value / 10,
+            giaTrung: parseFloat($('giaTrung').value) || 0,
+            giaNguoiLon: parseFloat($('giaNguoiLon').value) || 0,
+            giaTreEm: parseFloat($('giaTreEm').value) || 0,
+            extraPrice: parseFloat($('extraPrice').value) || 0,
+            overrideName: $('overrideName').value.trim() // Lấy giá trị mã ghi đè
+        };
+
+        const calculatedPrice = calculateFinalPrice(file.name, config);
+        const line1 = getFormattedDate();
+        const line2 = `${config.supplier} ${calculatedPrice}`;
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.drawImage(img, 0, 0);
+
+        const fontSize = Math.floor(img.width * config.sizeRatio);
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.fillStyle = config.color;
+        ctx.globalAlpha = config.opacity;
+        
+        ctx.shadowColor = "rgba(0,0,0,0.7)";
+        ctx.shadowBlur = fontSize / 5;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+
+        const margin = fontSize * 0.8;
+        const spacing = fontSize * 1.2;
+        
+        let x = margin;
+        let y = fontSize + margin;
+
+        if (config.pos === 'bottom-right') {
+            const metrics2 = ctx.measureText(line2);
+            x = img.width - metrics2.width - margin;
+            y = img.height - spacing - margin;
+        }
+
+        ctx.fillText(line1, x, y);
+        ctx.fillText(line2, x, y + spacing);
+
+        canvas.dataset.rendered = "true";
+        return `${config.supplier}_${calculatedPrice}_${line1.replace(/[:/]/g, '-')}`;
+    }
+
+    downloadBtn.onclick = async () => {
+        if (!fileData.length) return;
+        downloadBtn.disabled = true;
+        const quality = parseInt($('quality').value) / 100;
+
+        for (let i = 0; i < fileData.length; i++) {
+            status.innerText = `Đang xuất: ${i + 1}/${fileData.length}`;
+            const hiddenCanvas = document.createElement('canvas');
+            const fileName = await render(i, hiddenCanvas);
+            
+            const link = document.createElement('a');
+            link.download = `${fileName}.jpg`;
+            link.href = hiddenCanvas.toDataURL('image/jpeg', quality);
+            link.click();
+            
+            URL.revokeObjectURL(link.href);
+            await new Promise(r => setTimeout(r, 300)); 
+        }
+
+        status.innerText = "✅ Hoàn tất tải xuống!";
+        downloadBtn.disabled = false;
+    };
+
+    function loadImage(file) {
+        return new Promise(res => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => { URL.revokeObjectURL(url); res(img); };
+            img.src = url;
+        });
+    }if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("PWA Ready!"))
+    .catch((err) => console.log("Lỗi:", err));
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("PWA Ready!"))
+    .catch((err) => console.log("Lỗi:", err));
+}
+</script>
+</body>
+</html>
