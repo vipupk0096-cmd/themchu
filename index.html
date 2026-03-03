@@ -245,6 +245,7 @@
         const sharedPrices = new Set(); 
 
         try {
+            // 1. Tạo các ảnh thật
             for (let i = 0; i < fileData.length; i++) {
                 status.innerText = `Đang xử lý: ${i + 1}/${fileData.length}...`;
                 const tempCanvas = document.createElement('canvas');
@@ -253,16 +254,20 @@
                 sharedPrices.add(result.price); 
                 
                 const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-                
-                // Đổi đuôi thành .jpeg và dùng Date.now() để Zalo không bị nhầm file cache
-                const safeFileName = `IMG_${Date.now()}_${i}.jpeg`;
-                const file = new File([blob], safeFileName, { type: 'image/jpeg' });
+                const file = new File([blob], `IMG_${Date.now()}_${i}.jpeg`, { type: 'image/jpeg' });
                 exportedFiles.push(file);
                 
-                // DELAY 150ms: Giúp iOS xả bộ nhớ, Zalo nhận đủ ảnh không bị rớt file cuối
-                await new Promise(r => setTimeout(r, 150));
+                await new Promise(r => setTimeout(r, 100)); // Delay nhẹ
             }
 
+            // 2. MẸO ZALO: Tạo thêm 1 ảnh ảo (Trắng tinh, 1x1 pixel) vào cuối cùng
+            const dummyCanvas = document.createElement('canvas');
+            dummyCanvas.width = 1; dummyCanvas.height = 1;
+            const dummyBlob = await new Promise(resolve => dummyCanvas.toBlob(resolve, 'image/jpeg', 0.1));
+            const dummyFile = new File([dummyBlob], `IMG_ZaloFix_${Date.now()}.jpeg`, { type: 'image/jpeg' });
+            exportedFiles.push(dummyFile);
+
+            // 3. Kích hoạt Share
             if (navigator.canShare && navigator.canShare({ files: exportedFiles })) {
                 const finalShareText = Array.from(sharedPrices).join(' - '); 
                 
@@ -310,4 +315,5 @@
 </script>
 </body>
 </html>
+
 
