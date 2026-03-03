@@ -11,7 +11,7 @@
         .container { max-width: 100%; margin: auto; padding-bottom: 80px; }
         
         .controls { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .grid-settings { display: grid; grid-template-columns: 1fr; gap: 12px; } /* Mobile: 1 cột */
+        .grid-settings { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 600px) { .grid-settings { grid-template-columns: 1fr 1fr; } }
         
         .formula-group { background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px dashed #ced4da; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -83,6 +83,8 @@
                     <input type="color" id="textColor" value="#ffffff" style="width: 50px; padding: 2px; height: 45px;">
                     <select id="textPos">
                         <option value="top-left">Trái - Trên</option>
+                        <option value="top-right">Phải - Trên</option>
+                        <option value="bottom-left">Trái - Dưới</option>
                         <option value="bottom-right" selected>Phải - Dưới</option>
                     </select>
                 </div>
@@ -96,7 +98,7 @@
             </div>
             <div>
                 <label>5. Mã ghi đè (Tùy chọn)</label>
-                <input type="text" id="overrideName" placeholder="VD: 15b (Bỏ trống dùng tên gốc)">
+                <input type="text" id="overrideName" placeholder="VD: 20b/25b/30b">
             </div>
 
             <div class="formula-group">
@@ -130,7 +132,7 @@
     const $ = id => document.getElementById(id);
     const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
     
-    // Tự động lưu giá trị input vào bộ nhớ máy
+    // Tự động lưu thiết lập
     const inputsToSave = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor'];
     inputsToSave.forEach(id => {
         const el = $(id);
@@ -143,34 +145,31 @@
 
     function calculateFinalPrice(filename, config) {
         const sourceName = config.overrideName ? config.overrideName : filename;
-        const match = sourceName.match(/^(\d+)([blBL])/); 
-        if (match) {
-            const number = parseFloat(match[1]); 
-            const type = match[2].toLowerCase(); 
-            let finalPrice = 0;
-            const baseCost = number * config.giaTrung; 
-            if (type === 'l') finalPrice = baseCost + config.giaNguoiLon + config.extraPrice;
-            else if (type === 'b') finalPrice = baseCost + config.giaTreEm + config.extraPrice;
-            return Math.round(finalPrice) + "k";
+        const regex = /(\d+)\s*([blBL])/gi; 
+        const matches = [...sourceName.matchAll(regex)];
+        
+        if (matches.length > 0) {
+            const prices = matches.map(match => {
+                const number = parseFloat(match[1]); 
+                const type = match[2].toLowerCase(); 
+                let finalPrice = 0;
+                const baseCost = number * config.giaTrung; 
+                
+                if (type === 'l') finalPrice = baseCost + config.giaNguoiLon + config.extraPrice;
+                else if (type === 'b') finalPrice = baseCost + config.giaTreEm + config.extraPrice;
+                
+                return Math.round(finalPrice) + "k";
+            });
+            return prices.join('/');
         }
         return sourceName.split(/[\s._-]/)[0]; 
-    }
-
-    function getFormattedDate() {
-        const now = new Date();
-        let hh = now.getHours();
-        const mm = String(now.getMinutes()).padStart(2, '0');
-        const ampm = hh >= 12 ? 'pm' : 'am';
-        return `${hh%12||12}:${mm}${ampm} ${now.getDate()}/${now.getMonth() + 1}`;
     }
 
     upload.onchange = (e) => {
         fileData = Array.from(e.target.files);
         previewGrid.innerHTML = "";
         
-        // CHỈ HIỂN THỊ 2 ẢNH DEMO ĐỂ TRÁNH ĐƠ MÁY
         const demoFiles = fileData.slice(0, 2);
-        
         demoFiles.forEach((file, i) => {
             const card = document.createElement('div');
             card.className = 'preview-item';
@@ -205,8 +204,7 @@
         };
 
         const calculatedPrice = calculateFinalPrice(file.name, config);
-        const line1 = getFormattedDate();
-        const line2 = `${config.supplier} ${calculatedPrice}`;
+        const textLine = `${config.supplier} ${calculatedPrice}`;
 
         canvas.width = img.width; canvas.height = img.height;
         const ctx = canvas.getContext('2d');
@@ -219,51 +217,61 @@
         ctx.shadowColor = "rgba(0,0,0,0.7)";
         ctx.shadowBlur = fontSize / 5; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
 
-        const margin = fontSize * 0.8; const spacing = fontSize * 1.2;
-        let x = margin, y = fontSize + margin;
+        const margin = fontSize * 0.8;
+        let x, y;
 
-        if (config.pos === 'bottom-right') {
-            ctx.textAlign = 'right';
-            x = img.width - margin;
-            y = img.height - spacing - margin;
+        if (config.pos === 'top-left') {
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            x = margin; y = margin;
+        } else if (config.pos === 'top-right') {
+            ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+            x = img.width - margin; y = margin;
+        } else if (config.pos === 'bottom-left') {
+            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            x = margin; y = img.height - margin;
         } else {
-            ctx.textAlign = 'left';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+            x = img.width - margin; y = img.height - margin;
         }
 
-        ctx.fillText(line1, x, y); ctx.fillText(line2, x, y + spacing);
-        
-        return { fileName: `${config.supplier}_${calculatedPrice}`, canvas: canvas };
+        ctx.fillText(textLine, x, y);
+        return { canvas: canvas, price: calculatedPrice };
     }
 
-    // XUẤT ẢNH DÙNG WEB SHARE API (CHO IPHONE)
     downloadBtn.onclick = async () => {
         if (!fileData.length) return;
         downloadBtn.disabled = true;
+        
         const exportedFiles = [];
+        const sharedPrices = new Set(); 
 
         try {
             for (let i = 0; i < fileData.length; i++) {
                 status.innerText = `Đang xử lý: ${i + 1}/${fileData.length}...`;
                 const tempCanvas = document.createElement('canvas');
-                const result = await renderCanvas(fileData[i], tempCanvas);
                 
-                // Chuyển Canvas thành File để Share
+                const result = await renderCanvas(fileData[i], tempCanvas);
+                sharedPrices.add(result.price); 
+                
                 const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-                const file = new File([blob], `${result.fileName}_${i}.jpg`, { type: 'image/jpeg' });
+                
+                const safeFileName = `IMG_${Date.now()}_${i}.jpg`;
+                const file = new File([blob], safeFileName, { type: 'image/jpeg' });
                 exportedFiles.push(file);
             }
 
-            // Gọi bảng chia sẻ của iOS
             if (navigator.canShare && navigator.canShare({ files: exportedFiles })) {
-                status.innerText = "⏳ Đang mở bảng lưu ảnh...";
+                const finalShareText = Array.from(sharedPrices).join(' - '); 
+                
+                status.innerText = "⏳ Đang mở bảng chia sẻ...";
                 await navigator.share({
                     files: exportedFiles,
-                    title: 'Ảnh đã đóng dấu',
+                    title: finalShareText,
+                    text: finalShareText
                 });
                 status.innerText = "✅ Hoàn tất!";
             } else {
-                // Fallback cho máy không hỗ trợ Share API
-                status.innerText = "Máy không hỗ trợ lưu tự động. Bắt đầu tải từng file...";
+                status.innerText = "Máy không hỗ trợ lưu tự động. Đang tải...";
                 exportedFiles.forEach(file => {
                     const url = URL.createObjectURL(file);
                     const a = document.createElement('a');
@@ -272,6 +280,10 @@
                 });
                 status.innerText = "✅ Đã tải xong!";
             }
+            
+            // Xóa trắng ô mã ghi đè sau khi xuất thành công
+            $('overrideName').value = '';
+            
         } catch (error) {
             console.error("Lỗi:", error);
             status.innerText = "❌ Hủy lưu hoặc có lỗi xảy ra.";
@@ -290,7 +302,6 @@
         });
     }
 
-    // Đăng ký Service Worker cho PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
     }
