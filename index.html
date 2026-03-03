@@ -98,7 +98,7 @@
             </div>
             <div>
                 <label>5. Mã ghi đè (Tùy chọn)</label>
-                <input type="text" id="overrideName" placeholder="VD: 20b/25b/30b">
+                <input type="text" id="overrideName" placeholder="VD: 35l/37l">
             </div>
 
             <div class="formula-group">
@@ -157,8 +157,10 @@
                 if (type === 'l') finalPrice = baseCost + config.giaNguoiLon + config.extraPrice;
                 else if (type === 'b') finalPrice = baseCost + config.giaTreEm + config.extraPrice;
                 
-                return Math.round(finalPrice) + "k";
+                // Add "Ht" prefix instead of "k" suffix
+                return "Ht" + Math.round(finalPrice);
             });
+            // Return prices joined with "/" (e.g., Ht154/Ht161)
             return prices.join('/');
         }
         return sourceName.split(/[\s._-]/)[0]; 
@@ -203,7 +205,10 @@
         };
 
         const calculatedPrice = calculateFinalPrice(file.name, config);
-        const textLine = `${config.supplier} ${calculatedPrice}`;
+        
+        // Construct the text line: Supplier Code + Price string
+        // Assuming config.supplier is just the code like "1A801" now based on your select values
+        const textLine = `${config.supplier} + ${calculatedPrice}`;
 
         canvas.width = img.width; canvas.height = img.height;
         const ctx = canvas.getContext('2d');
@@ -234,7 +239,9 @@
         }
 
         ctx.fillText(textLine, x, y);
-        return { canvas: canvas, price: calculatedPrice };
+        
+        // Return textLine for sharing purposes if needed
+        return { canvas: canvas, price: textLine }; 
     }
 
     downloadBtn.onclick = async () => {
@@ -245,7 +252,6 @@
         const sharedPrices = new Set(); 
 
         try {
-            // 1. Tạo các ảnh thật
             for (let i = 0; i < fileData.length; i++) {
                 status.innerText = `Đang xử lý: ${i + 1}/${fileData.length}...`;
                 const tempCanvas = document.createElement('canvas');
@@ -257,24 +263,23 @@
                 const file = new File([blob], `IMG_${Date.now()}_${i}.jpeg`, { type: 'image/jpeg' });
                 exportedFiles.push(file);
                 
-                await new Promise(r => setTimeout(r, 100)); // Delay nhẹ
+                await new Promise(r => setTimeout(r, 100)); 
             }
 
-            // 2. MẸO ZALO: Tạo thêm 1 ảnh ảo (Trắng tinh, 1x1 pixel) vào cuối cùng
             const dummyCanvas = document.createElement('canvas');
             dummyCanvas.width = 1; dummyCanvas.height = 1;
             const dummyBlob = await new Promise(resolve => dummyCanvas.toBlob(resolve, 'image/jpeg', 0.1));
             const dummyFile = new File([dummyBlob], `IMG_ZaloFix_${Date.now()}.jpeg`, { type: 'image/jpeg' });
             exportedFiles.push(dummyFile);
 
-            // 3. Kích hoạt Share
             if (navigator.canShare && navigator.canShare({ files: exportedFiles })) {
-                const finalShareText = Array.from(sharedPrices).join(' - '); 
+                // Modified share text format if desired, currently it just joins the lines
+                const finalShareText = Array.from(sharedPrices).join('\n'); 
                 
                 status.innerText = "⏳ Đang mở bảng chia sẻ...";
                 await navigator.share({
                     files: exportedFiles,
-                    title: finalShareText,
+                    title: "Báo giá",
                     text: finalShareText
                 });
                 status.innerText = "✅ Hoàn tất!";
@@ -315,5 +320,3 @@
 </script>
 </body>
 </html>
-
-
