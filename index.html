@@ -132,7 +132,6 @@
     const $ = id => document.getElementById(id);
     const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
     
-    // Tự động lưu thiết lập
     const inputsToSave = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor'];
     inputsToSave.forEach(id => {
         const el = $(id);
@@ -255,9 +254,13 @@
                 
                 const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/jpeg', 0.85));
                 
-                const safeFileName = `IMG_${Date.now()}_${i}.jpg`;
+                // Đổi đuôi thành .jpeg và dùng Date.now() để Zalo không bị nhầm file cache
+                const safeFileName = `IMG_${Date.now()}_${i}.jpeg`;
                 const file = new File([blob], safeFileName, { type: 'image/jpeg' });
                 exportedFiles.push(file);
+                
+                // DELAY 150ms: Giúp iOS xả bộ nhớ, Zalo nhận đủ ảnh không bị rớt file cuối
+                await new Promise(r => setTimeout(r, 150));
             }
 
             if (navigator.canShare && navigator.canShare({ files: exportedFiles })) {
@@ -271,7 +274,7 @@
                 });
                 status.innerText = "✅ Hoàn tất!";
             } else {
-                status.innerText = "Máy không hỗ trợ lưu tự động. Đang tải...";
+                status.innerText = "Đang tải...";
                 exportedFiles.forEach(file => {
                     const url = URL.createObjectURL(file);
                     const a = document.createElement('a');
@@ -281,7 +284,6 @@
                 status.innerText = "✅ Đã tải xong!";
             }
             
-            // Xóa trắng ô mã ghi đè sau khi xuất thành công
             $('overrideName').value = '';
             
         } catch (error) {
@@ -308,3 +310,4 @@
 </script>
 </body>
 </html>
+
