@@ -3,34 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINH ĐẸP TRAI</title>
-    <link rel="manifest" href="manifest.json">
+    <title>MINH ĐẸP TRAI - WATERMARK</title>
     <style>
         :root { --primary: #007bff; --success: #28a745; --dark: #2d3436; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: var(--dark); }
-        .container { max-width: 100%; margin: auto; padding-bottom: 80px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: var(--dark); -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 100%; margin: auto; padding-bottom: 90px; }
         
-        .controls { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .controls { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .grid-settings { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 600px) { .grid-settings { grid-template-columns: 1fr 1fr; } }
         
-        .formula-group { background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px dashed #ced4da; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .formula-group { background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e0e0e0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .preview-item { background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+        .preview-item { background: white; padding: 8px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
         
-        canvas { max-width: 100%; height: auto; border-radius: 4px; }
-        label { font-weight: 600; font-size: 0.8rem; color: #636e72; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: #fff;}
+        canvas { max-width: 100%; height: auto; border-radius: 6px; display: block; }
+        label { font-weight: 700; font-size: 0.75rem; color: #636e72; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: #fff; appearance: none; }
         
         #downloadBtn { 
             background: var(--success); color: white; font-weight: bold; border: none; 
-            width: calc(100% - 20px); padding: 15px; border-radius: 12px;
-            font-size: 1.1rem; position: fixed; bottom: 10px; left: 10px; z-index: 1000;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+            width: calc(100% - 20px); padding: 18px; border-radius: 15px;
+            font-size: 1.1rem; position: fixed; bottom: 15px; left: 10px; z-index: 1000;
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3); active { transform: scale(0.98); }
         }
         #downloadBtn:disabled { background: #6c757d; box-shadow: none; }
-        .status { text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); font-size: 0.9rem; }
+        .status { text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -80,7 +79,7 @@
             <div>
                 <label>3. Màu & Vị trí</label>
                 <div style="display: flex; gap: 8px;">
-                    <input type="color" id="textColor" value="#ffffff" style="width: 50px; padding: 2px; height: 45px;">
+                    <input type="color" id="textColor" value="#ffffff" style="width: 60px; padding: 2px; height: 45px;">
                     <select id="textPos">
                         <option value="top-left">Trái - Trên</option>
                         <option value="top-right">Phải - Trên</option>
@@ -91,32 +90,32 @@
             </div>
             <div>
                 <label>4. Cỡ chữ & Mờ</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="range" id="textSize" min="1" max="20" value="7">
+                <div style="display: flex; gap: 10px; align-items: center; height: 45px;">
+                    <input type="range" id="textSize" min="1" max="25" value="8">
                     <input type="range" id="textOpacity" min="1" max="10" value="10">
                 </div>
             </div>
             <div>
-                <label>5. Mã ghi đè (Tùy chọn)</label>
-                <input type="text" id="overrideName" placeholder="VD: 35l/37l">
+                <label>5. Mã ghi đè (VD: 35l/37l)</label>
+                <input type="text" id="overrideName" placeholder="Tên file hoặc mã thủ công">
             </div>
 
             <div class="formula-group">
                 <div>
-                    <label>Giá (NDT)</label>
-                    <input type="number" id="giaTrung" value="3.9" step="0.1" style="color: var(--primary); font-weight: bold;">
+                    <label>Giá NDT</label>
+                    <input type="number" id="giaTrung" value="3.9" step="0.1">
                 </div>
                 <div>
                     <label>Lớn (L)</label>
-                    <input type="number" id="giaNguoiLon" value="17" step="1" style="color: #d63031; font-weight: bold;">
+                    <input type="number" id="giaNguoiLon" value="17" step="1">
                 </div>
                 <div>
                     <label>Trẻ (B)</label>
-                    <input type="number" id="giaTreEm" value="15" step="1" style="color: #0984e3; font-weight: bold;">
+                    <input type="number" id="giaTreEm" value="15" step="1">
                 </div>
                 <div>
                     <label>Phụ phí</label>
-                    <input type="number" id="extraPrice" value="0" step="1" style="color: var(--success); font-weight: bold;">
+                    <input type="number" id="extraPrice" value="0" step="1">
                 </div>
             </div>
         </div>
@@ -126,91 +125,59 @@
     <div id="previewGrid" class="preview-grid"></div>
 </div>
 
-<button id="downloadBtn">XUẤT & LƯU ẢNH (IPHONE)</button>
+<button id="downloadBtn">XUẤT & CHIA SẺ (IPHONE)</button>
 
 <script>
     const $ = id => document.getElementById(id);
     const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
     
-    const inputsToSave = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor'];
+    // Lưu và nạp cấu hình từ localStorage
+    const inputsToSave = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor', 'textSize', 'textOpacity'];
     inputsToSave.forEach(id => {
         const el = $(id);
         if (localStorage.getItem(id)) el.value = localStorage.getItem(id);
-        el.addEventListener('change', () => localStorage.setItem(id, el.value));
+        el.addEventListener('input', () => localStorage.setItem(id, el.value));
     });
 
-    const configIds = [...inputsToSave, 'textSize', 'textOpacity', 'overrideName'];
     let fileData = [];
 
     function calculateFinalPrice(filename, config) {
-        const sourceName = config.overrideName ? config.overrideName : filename;
+        const sourceName = config.overrideName || filename;
         const regex = /(\d+)\s*([blBL])/gi; 
         const matches = [...sourceName.matchAll(regex)];
         
         if (matches.length > 0) {
-            const prices = matches.map(match => {
+            return matches.map(match => {
                 const number = parseFloat(match[1]); 
                 const type = match[2].toLowerCase(); 
-                let finalPrice = 0;
-                const baseCost = number * config.giaTrung; 
-                
-                if (type === 'l') finalPrice = baseCost + config.giaNguoiLon + config.extraPrice;
-                else if (type === 'b') finalPrice = baseCost + config.giaTreEm + config.extraPrice;
-                
-                // Add "Ht" prefix instead of "k" suffix
-                return "Ht" + Math.round(finalPrice);
-            });
-            // Return prices joined with "/" (e.g., Ht154/Ht161)
-            return prices.join('/');
+                const base = number * config.giaTrung;
+                const price = (type === 'l' ? config.giaNguoiLon : config.giaTreEm) + base + config.extraPrice;
+                return "Ht" + Math.round(price);
+            }).join('/');
         }
-        return sourceName.split(/[\s._-]/)[0]; 
+        return ""; 
     }
-
-    upload.onchange = (e) => {
-        fileData = Array.from(e.target.files);
-        previewGrid.innerHTML = "";
-        
-        const demoFiles = fileData.slice(0, 2);
-        demoFiles.forEach((file, i) => {
-            const card = document.createElement('div');
-            card.className = 'preview-item';
-            card.innerHTML = `<canvas id="canvas_${i}"></canvas><div style="font-size:10px; margin-top:5px; white-space:nowrap; overflow:hidden;">${file.name}</div>`;
-            previewGrid.appendChild(card);
-            renderCanvas(file, $(`canvas_${i}`));
-        });
-        
-        status.innerText = `Đã tải ${fileData.length} ảnh. Đang xem trước 2 ảnh.`;
-    };
-
-    configIds.forEach(id => {
-        const element = $(id);
-        if (element) {
-            element.addEventListener('input', () => {
-                if(fileData.length > 0) {
-                    const demoFiles = fileData.slice(0, 2);
-                    demoFiles.forEach((file, i) => renderCanvas(file, $(`canvas_${i}`)));
-                }
-            });
-        }
-    });
 
     async function renderCanvas(file, canvas) {
         const img = await loadImage(file);
         const config = {
-            supplier: $('supplier').value, color: $('textColor').value,
-            sizeRatio: $('textSize').value / 100, pos: $('textPos').value, opacity: $('textOpacity').value / 10,
-            giaTrung: parseFloat($('giaTrung').value) || 0, giaNguoiLon: parseFloat($('giaNguoiLon').value) || 0,
-            giaTreEm: parseFloat($('giaTreEm').value) || 0, extraPrice: parseFloat($('extraPrice').value) || 0,
+            supplier: $('supplier').value, 
+            color: $('textColor').value,
+            sizeRatio: $('textSize').value / 100, 
+            pos: $('textPos').value, 
+            opacity: $('textOpacity').value / 10,
+            giaTrung: parseFloat($('giaTrung').value) || 0, 
+            giaNguoiLon: parseFloat($('giaNguoiLon').value) || 0,
+            giaTreEm: parseFloat($('giaTreEm').value) || 0, 
+            extraPrice: parseFloat($('extraPrice').value) || 0,
             overrideName: $('overrideName').value.trim()
         };
 
-        const calculatedPrice = calculateFinalPrice(file.name, config);
-        
-        // Construct the text line: Supplier Code + Price string
-        // Assuming config.supplier is just the code like "1A801" now based on your select values
-        const textLine = `${config.supplier} + ${calculatedPrice}`;
+        const pricePart = calculateFinalPrice(file.name, config);
+        const textLine = `${config.supplier}${pricePart}`;
 
-        canvas.width = img.width; canvas.height = img.height;
+        canvas.width = img.width; 
+        canvas.height = img.height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
 
@@ -218,104 +185,109 @@
         ctx.font = `bold ${fontSize}px sans-serif`;
         ctx.fillStyle = config.color;
         ctx.globalAlpha = config.opacity;
-        ctx.shadowColor = "rgba(0,0,0,0.7)";
-        ctx.shadowBlur = fontSize / 5; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
+        
+        // Đổ bóng chữ để dễ nhìn trên mọi nền
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = fontSize / 4; 
+        ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
 
-        const margin = fontSize * 0.8;
+        const margin = fontSize * 0.6;
         let x, y;
 
         if (config.pos === 'top-left') {
-            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-            x = margin; y = margin;
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top'; x = margin; y = margin;
         } else if (config.pos === 'top-right') {
-            ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-            x = img.width - margin; y = margin;
+            ctx.textAlign = 'right'; ctx.textBaseline = 'top'; x = img.width - margin; y = margin;
         } else if (config.pos === 'bottom-left') {
-            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-            x = margin; y = img.height - margin;
+            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; x = margin; y = img.height - margin;
         } else {
-            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-            x = img.width - margin; y = img.height - margin;
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; x = img.width - margin; y = img.height - margin;
         }
 
         ctx.fillText(textLine, x, y);
-        
-        // Return textLine for sharing purposes if needed
-        return { canvas: canvas, price: textLine }; 
+        return { canvas: canvas, text: textLine }; 
     }
 
+    upload.onchange = (e) => {
+        fileData = Array.from(e.target.files);
+        previewGrid.innerHTML = "";
+        if(fileData.length > 0) {
+            const demo = fileData.slice(0, 2);
+            demo.forEach((file, i) => {
+                const card = document.createElement('div');
+                card.className = 'preview-item';
+                card.innerHTML = `<canvas id="canvas_${i}"></canvas>`;
+                previewGrid.appendChild(card);
+                renderCanvas(file, $(`canvas_${i}`));
+            });
+            status.innerText = `Đã chọn ${fileData.length} ảnh.`;
+        }
+    };
+
+    // Update preview realtime khi chỉnh thông số
+    ['supplier', 'textColor', 'textPos', 'textSize', 'textOpacity', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'overrideName'].forEach(id => {
+        $(id).addEventListener('input', () => {
+            if(fileData.length > 0) {
+                fileData.slice(0, 2).forEach((file, i) => {
+                    const canvas = $(`canvas_${i}`);
+                    if(canvas) renderCanvas(file, canvas);
+                });
+            }
+        });
+    });
+
     downloadBtn.onclick = async () => {
-        if (!fileData.length) return;
+        if (!fileData.length) return alert("Vui lòng chọn ảnh!");
         downloadBtn.disabled = true;
+        status.innerText = "🚀 Đang xử lý...";
         
         const exportedFiles = [];
-        const sharedPrices = new Set(); 
+        const infoSummary = [];
 
         try {
             for (let i = 0; i < fileData.length; i++) {
-                status.innerText = `Đang xử lý: ${i + 1}/${fileData.length}...`;
                 const tempCanvas = document.createElement('canvas');
-                
                 const result = await renderCanvas(fileData[i], tempCanvas);
-                sharedPrices.add(result.price); 
                 
-                const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-                const file = new File([blob], `IMG_${Date.now()}_${i}.jpeg`, { type: 'image/jpeg' });
+                const blob = await new Promise(res => tempCanvas.toBlob(res, 'image/jpeg', 0.9));
+                const file = new File([blob], `IMG_${i}.jpg`, { type: 'image/jpeg' });
                 exportedFiles.push(file);
-                
-                await new Promise(r => setTimeout(r, 100)); 
+                infoSummary.push(result.text);
             }
 
-            const dummyCanvas = document.createElement('canvas');
-            dummyCanvas.width = 1; dummyCanvas.height = 1;
-            const dummyBlob = await new Promise(resolve => dummyCanvas.toBlob(resolve, 'image/jpeg', 0.1));
-            const dummyFile = new File([dummyBlob], `IMG_ZaloFix_${Date.now()}.jpeg`, { type: 'image/jpeg' });
-            exportedFiles.push(dummyFile);
-
-            if (navigator.canShare && navigator.canShare({ files: exportedFiles })) {
-                // Modified share text format if desired, currently it just joins the lines
-                const finalShareText = Array.from(sharedPrices).join('\n'); 
-                
-                status.innerText = "⏳ Đang mở bảng chia sẻ...";
+            if (navigator.share) {
                 await navigator.share({
                     files: exportedFiles,
-                    title: "Báo giá",
-                    text: finalShareText
+                    title: 'Ảnh đã đóng dấu',
+                    text: Array.from(new Set(infoSummary)).join('\n')
                 });
-                status.innerText = "✅ Hoàn tất!";
+                status.innerText = "✅ Đã chia sẻ!";
             } else {
-                status.innerText = "Đang tải...";
-                exportedFiles.forEach(file => {
-                    const url = URL.createObjectURL(file);
+                alert("Trình duyệt không hỗ trợ chia sẻ. Đang tải xuống...");
+                exportedFiles.forEach(f => {
                     const a = document.createElement('a');
-                    a.href = url; a.download = file.name; a.click();
-                    URL.revokeObjectURL(url);
+                    a.href = URL.createObjectURL(f);
+                    a.download = f.name;
+                    a.click();
                 });
-                status.innerText = "✅ Đã tải xong!";
             }
-            
-            $('overrideName').value = '';
-            
-        } catch (error) {
-            console.error("Lỗi:", error);
-            status.innerText = "❌ Hủy lưu hoặc có lỗi xảy ra.";
+        } catch (err) {
+            console.error(err);
+            status.innerText = "❌ Lỗi khi xuất ảnh.";
         }
-        
         downloadBtn.disabled = false;
-        downloadBtn.innerText = "XUẤT & LƯU ẢNH (IPHONE)";
     };
 
     function loadImage(file) {
         return new Promise(res => {
-            const url = URL.createObjectURL(file);
-            const img = new Image();
-            img.onload = () => { URL.revokeObjectURL(url); res(img); };
-            img.src = url;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => res(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         });
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
     }
 </script>
 </body>
