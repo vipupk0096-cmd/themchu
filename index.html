@@ -218,48 +218,111 @@
     });
 
     downloadBtn.onclick = async () => {
-        if (!fileData.length) return alert("Chưa có ảnh!");
-        downloadBtn.disabled = true;
-        status.innerText = "⏳ Đang nén & đóng dấu...";
-        
-        try {
-            const filesToShare = [];
-            const textLabels = [];
-
-            for (let i = 0; i < fileData.length; i++) {
-                const tempCanvas = document.createElement('canvas');
-                const result = await renderCanvas(fileData[i], tempCanvas);
-                const blob = await new Promise(r => tempCanvas.toBlob(r, 'image/jpeg', 0.9));
-                filesToShare.push(new File([blob], `minh_${i}.jpg`, { type: 'image/jpeg' }));
-                textLabels.push(result.text);
-            }
-
-            if (navigator.share) {
-                await navigator.share({
-                    files: filesToShare,
-                    text: Array.from(new Set(textLabels)).join('\n')
-                });
-                status.innerText = "✅ Hoàn tất!";
-            } else {
-                status.innerText = "⚠️ Trình duyệt không hỗ trợ Share API.";
-            }
-        } catch (e) {
-            status.innerText = "❌ Đã hủy hoặc gặp lỗi.";
-        }
-        downloadBtn.disabled = false;
-    };
-
-    function loadImage(file) {
-        return new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => res(img);
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
+    if (!fileData.length) {
+        alert("Chưa có ảnh!");
+        return;
     }
+
+    downloadBtn.disabled = true;
+    status.innerText = "⏳ Đang xử lý...";
+
+    const MAX_WIDTH = 1500;      // giảm tải RAM
+    const JPEG_QUALITY = 0.75;   // giảm dung lượng
+    const BATCH_SIZE = 4;        // Zalo ổn định nhất 3–4 ảnh/lần
+
+    try {
+        const filesToShare = [];
+        const textLabels = [];
+
+        for (let i = 0; i < fileData.length; i++) {
+
+            const tempCanvas = document.createElement("canvas");
+            const result = await renderCanvas(fileData[i], tempCanvas);
+
+            // Resize lại nếu quá lớn
+            if (tempCanvas.width > MAX_WIDTH) {
+                const scale = MAX_WIDTH / tempCanvas.width;
+                const resizedCanvas = document.createElement("canvas");
+                resizedCanvas.width = MAX_WIDTH;
+                resizedCanvas.height = tempCanvas.height * scale;
+
+                const rctx = resizedCanvas.getContext("2d");
+                rctx.drawImage(
+                    tempCanvas,
+                    0, 0,
+                    resizedCanvas.width,
+                    resizedCanvas.height
+                );
+
+                tempCanvas.width = 0;
+                tempCanvas.height = 0;
+
+                tempCanvas.width = resizedCanvas.width;
+                tempCanvas.height = resizedCanvas.height;
+                tempCanvas.getContext("2d")
+                    .drawImage(resizedCanvas, 0, 0);
+            }
+
+            const blob = await new Promise(resolve =>
+                tempCanvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY)
+            );
+
+            if (!blob) {
+                console.warn("Blob null:", i);
+                continue;
+            }
+
+            filesToShare.push(
+                new File([blob], `minh_${i + 1}.jpg`, {
+                    type: "image/jpeg"
+                })
+            );
+
+            textLabels.push(result.text);
+
+            // Clear memory ngay sau khi xong
+            tempCanvas.width = 0;
+            tempCanvas.height = 0;
+        }
+
+        if (!filesToShare.length) {
+            throw new Error("Không tạo được file nào.");
+        }
+
+        // ===== SHARE THEO BATCH =====
+        if (navigator.canShare) {
+
+            for (let i = 0; i < filesToShare.length; i += BATCH_SIZE) {
+
+                const batch = filesToShare.slice(i, i + BATCH_SIZE);
+
+                if (!navigator.canShare({ files: batch })) {
+                    console.warn("Batch không share được:", batch);
+                    continue;
+                }
+
+                await navigator.share({
+                    files: batch,
+                    text: [...new Set(textLabels)].join("\n")
+                });
+
+                // Delay nhẹ để tránh crash iOS
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            status.innerText = "✅ Hoàn tất!";
+        } else {
+            status.innerText = "⚠️ Trình duyệt không hỗ trợ Share API.";
+        }
+
+    } catch (err) {
+        console.error(err);
+        status.innerText = "❌ Đã hủy hoặc gặp lỗi.";
+    }
+
+    downloadBtn.disabled = false;
+};
 </script>
 </body>
 </html>
+
