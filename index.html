@@ -6,24 +6,30 @@
     <title>MINH WATERMARK PRO 2026</title>
     <style>
         :root { --primary: #007bff; --success: #28a745; --dark: #2d3436; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: var(--dark); }
-        .container { max-width: 600px; margin: auto; padding-bottom: 120px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: var(--dark); -webkit-user-select: none; }
+        .container { max-width: 100%; margin: auto; padding-bottom: 100px; }
+        
         .controls { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .grid-settings { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 600px) { .grid-settings { grid-template-columns: 1fr 1fr; } }
+        
         .formula-group { background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e0e0e0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
         .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .preview-item { background: white; padding: 5px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
-        canvas { max-width: 100%; height: auto; border-radius: 6px; display: block; margin: auto; }
-        label { font-weight: 700; font-size: 0.7rem; color: #636e72; display: block; margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        
+        canvas { max-width: 100%; height: auto; border-radius: 6px; display: block; }
+        label { font-weight: 700; font-size: 0.75rem; color: #636e72; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: #fff; }
+        
         #downloadBtn { 
             background: var(--success); color: white; font-weight: bold; border: none; 
             width: calc(100% - 20px); padding: 18px; border-radius: 15px;
             font-size: 1.1rem; position: fixed; bottom: 15px; left: 10px; z-index: 1000;
             box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
         }
-        #downloadBtn:disabled { background: #ccc; box-shadow: none; }
-        .status { text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); font-size: 0.85rem; height: 20px; }
+        #downloadBtn:active { transform: scale(0.98); background: #218838; }
+        .status { text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -75,7 +81,7 @@
                 <div style="display: flex; gap: 8px;">
                     <input type="color" id="textColor" value="#ffffff" style="width: 60px; height: 45px; padding: 2px;">
                     <select id="textPos">
-                        <option value="bottom-right">Phải - Dưới</option>
+                        <option value="bottom-right" selected>Phải - Dưới</option>
                         <option value="bottom-left">Trái - Dưới</option>
                         <option value="top-right">Phải - Trên</option>
                         <option value="top-left">Trái - Trên</option>
@@ -84,14 +90,14 @@
             </div>
             <div>
                 <label>4. Cỡ chữ & Mờ</label>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
                     <input type="range" id="textSize" min="1" max="25" value="8">
                     <input type="range" id="textOpacity" min="1" max="10" value="10">
                 </div>
             </div>
             <div>
-                <label>5. Mã ghi đè (VD: 35l/37b)</label>
-                <input type="text" id="overrideName" placeholder="Nhập mã nếu tên file không có">
+                <label>5. Mã ghi đè (VD: 35l/37l)</label>
+                <input type="text" id="overrideName" placeholder="Tên file hoặc nhập tay">
             </div>
 
             <div class="formula-group">
@@ -106,34 +112,34 @@
     <div id="previewGrid" class="preview-grid"></div>
 </div>
 
-<button id="downloadBtn">XUẤT & CHIA SẺ ZALO</button>
+<button id="downloadBtn">XUẤT & CHIA SẺ ZALO/IPHONE</button>
 
 <script>
     const $ = id => document.getElementById(id);
-    let fileData = [];
-    const MAX_WIDTH = 1280; // Chuẩn nén Zalo giúp ổn định
-
-    // Tự động lưu/tải cài đặt
+    const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
+    
+    // Lưu và nạp lại dữ liệu cũ từ bộ nhớ trình duyệt
     const fields = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor', 'textSize', 'textOpacity'];
     fields.forEach(id => {
         if (localStorage.getItem(id)) $(id).value = localStorage.getItem(id);
-        $(id).addEventListener('input', () => {
-            localStorage.setItem(id, $(id).value);
-            updatePreview();
-        });
+        $(id).addEventListener('input', () => localStorage.setItem(id, $(id).value));
     });
-    $('overrideName').addEventListener('input', updatePreview);
 
+    let fileData = [];
+
+    // Hàm tính toán giá: Xuất ra định dạng ht155/160
     function calculatePriceString(filename, config) {
         const source = config.overrideName || filename;
         const regex = /(\d+)\s*([blBL])/gi; 
         const matches = [...source.matchAll(regex)];
+        
         if (matches.length > 0) {
             const prices = matches.map(match => {
                 const num = parseFloat(match[1]);
                 const type = match[2].toLowerCase();
+                const base = num * config.giaTrung;
                 const added = (type === 'l' ? config.giaNguoiLon : config.giaTreEm);
-                return Math.round(num * config.giaTrung + added + config.extraPrice);
+                return Math.round(base + added + config.extraPrice);
             });
             return "ht" + prices.join('/');
         }
@@ -141,16 +147,7 @@
     }
 
     async function renderCanvas(file, canvas) {
-        const img = await new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const i = new Image();
-                i.onload = () => res(i);
-                i.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
+        const img = await loadImage(file);
         const config = {
             supplier: $('supplier').value,
             color: $('textColor').value,
@@ -164,95 +161,105 @@
             overrideName: $('overrideName').value.trim()
         };
 
-        // Resize
-        let w = img.width, h = img.height;
-        if (w > MAX_WIDTH) {
-            h = Math.floor(h * (MAX_WIDTH / w));
-            w = MAX_WIDTH;
-        }
-        canvas.width = w; canvas.height = h;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-
-        // Text
         const pricePart = calculatePriceString(file.name, config);
-        const text = `${config.supplier}${pricePart}`;
-        const fontSize = Math.floor(w * config.sizeRatio);
-        
+        const finalMainText = `${config.supplier}${pricePart}`; 
+
+        canvas.width = img.width; 
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        const fontSize = Math.floor(img.width * config.sizeRatio);
         ctx.font = `bold ${fontSize}px sans-serif`;
         ctx.fillStyle = config.color;
         ctx.globalAlpha = config.opacity;
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        
+        // Đổ bóng đậm giúp nhìn rõ trên ảnh sáng màu
+        ctx.shadowColor = "rgba(0,0,0,0.85)";
         ctx.shadowBlur = fontSize / 4;
         ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
 
         const margin = fontSize * 0.7;
         ctx.textAlign = config.pos.includes('right') ? 'right' : 'left';
         ctx.textBaseline = config.pos.includes('bottom') ? 'bottom' : 'top';
-        const x = config.pos.includes('right') ? w - margin : margin;
-        const y = config.pos.includes('bottom') ? h - margin : margin;
+        
+        const x = config.pos.includes('right') ? img.width - margin : margin;
+        const y = config.pos.includes('bottom') ? img.height - margin : margin;
 
-        ctx.fillText(text, x, y);
+        ctx.fillText(finalMainText, x, y);
+        return { canvas, text: finalMainText };
     }
 
-    function updatePreview() {
-        if (fileData.length) {
-            fileData.slice(0, 2).forEach((f, i) => {
-                const cvs = $(`canvas_${i}`);
-                if (cvs) renderCanvas(f, cvs);
-            });
-        }
-    }
-
-    $('upload').onchange = (e) => {
+    upload.onchange = (e) => {
         fileData = Array.from(e.target.files);
-        $('previewGrid').innerHTML = "";
-        fileData.slice(0, 2).forEach((file, i) => {
-            const div = document.createElement('div');
-            div.className = 'preview-item';
-            div.innerHTML = `<canvas id="canvas_${i}"></canvas>`;
-            $('previewGrid').appendChild(div);
-            renderCanvas(file, $(`canvas_${i}`));
-        });
-        $('status').innerText = `Đã chọn ${fileData.length} ảnh.`;
+        previewGrid.innerHTML = "";
+        if (fileData.length > 0) {
+            fileData.slice(0, 2).forEach((file, i) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `<canvas id="canvas_${i}"></canvas>`;
+                previewGrid.appendChild(div);
+                renderCanvas(file, $(`canvas_${i}`));
+            });
+            status.innerText = `Đã chọn ${fileData.length} ảnh.`;
+        }
     };
 
-    $('downloadBtn').onclick = async () => {
+    // Cập nhật xem trước khi thay đổi bất kỳ ô nhập liệu nào
+    [...fields, 'overrideName'].forEach(id => {
+        $(id).addEventListener('input', () => {
+            if (fileData.length) {
+                fileData.slice(0, 2).forEach((f, i) => {
+                    const canvas = $(`canvas_${i}`);
+                    if (canvas) renderCanvas(f, canvas);
+                });
+            }
+        });
+    });
+
+    downloadBtn.onclick = async () => {
         if (!fileData.length) return alert("Chưa có ảnh!");
-        const btn = $('downloadBtn');
-        const stt = $('status');
-        btn.disabled = true;
+        downloadBtn.disabled = true;
+        status.innerText = "⏳ Đang nén & đóng dấu...";
         
         try {
             const filesToShare = [];
+            const textLabels = [];
+
             for (let i = 0; i < fileData.length; i++) {
-                stt.innerText = `⏳ Đang xử lý ${i + 1}/${fileData.length}...`;
                 const tempCanvas = document.createElement('canvas');
-                await renderCanvas(fileData[i], tempCanvas);
-                
-                // Nén 0.7 để ảnh nhẹ, không lỗi luồng chia sẻ
-                const blob = await new Promise(r => tempCanvas.toBlob(r, 'image/jpeg', 0.7));
-                const fileName = `minh_${Date.now()}_${i}.jpg`;
-                filesToShare.push(new File([blob], fileName, { type: 'image/jpeg' }));
-                
-                // Nghỉ ngắn để trình duyệt giải phóng RAM
-                await new Promise(r => setTimeout(r, 150));
+                const result = await renderCanvas(fileData[i], tempCanvas);
+                const blob = await new Promise(r => tempCanvas.toBlob(r, 'image/jpeg', 0.9));
+                filesToShare.push(new File([blob], `minh_${i}.jpg`, { type: 'image/jpeg' }));
+                textLabels.push(result.text);
             }
 
             if (navigator.share) {
-                stt.innerText = "📤 Đang mở menu chia sẻ...";
-                await navigator.share({ files: filesToShare });
-                stt.innerText = "✅ Thành công!";
+                await navigator.share({
+                    files: filesToShare,
+                    text: Array.from(new Set(textLabels)).join('\n')
+                });
+                status.innerText = "✅ Hoàn tất!";
             } else {
-                alert("Hãy dùng Safari hoặc Chrome trên di động.");
+                status.innerText = "⚠️ Trình duyệt không hỗ trợ Share API.";
             }
         } catch (e) {
-            stt.innerText = "❌ Lỗi chia sẻ.";
-        } finally {
-            btn.disabled = false;
+            status.innerText = "❌ Đã hủy hoặc gặp lỗi.";
         }
+        downloadBtn.disabled = false;
     };
+
+    function loadImage(file) {
+        return new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => res(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 </script>
 </body>
 </html>
