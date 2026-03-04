@@ -1,50 +1,105 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINH WATERMARK PRO 2026</title>
-    <style>
-        :root { --primary: #007bff; --success: #28a745; --dark: #2d3436; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: var(--dark); -webkit-user-select: none; }
-        .container { max-width: 100%; margin: auto; padding-bottom: 100px; }
-        
-        .controls { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .grid-settings { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        @media (min-width: 600px) { .grid-settings { grid-template-columns: 1fr 1fr; } }
-        
-        .formula-group { background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e0e0e0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .preview-item { background: white; padding: 5px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
-        
-        canvas { max-width: 100%; height: auto; border-radius: 6px; display: block; }
-        label { font-weight: 700; font-size: 0.75rem; color: #636e72; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: #fff; }
-        
-        #downloadBtn { 
-            background: var(--success); color: white; font-weight: bold; border: none; 
-            width: calc(100% - 20px); padding: 18px; border-radius: 15px;
-            font-size: 1.1rem; position: fixed; bottom: 15px; left: 10px; z-index: 1000;
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-        }
-        #downloadBtn:active { transform: scale(0.98); background: #218838; }
-        .status { text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); font-size: 0.85rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINH WATERMARK PRO 2026</title>
+
+<style>
+:root { --primary:#007bff; --success:#28a745; --dark:#2d3436; }
+
+body {
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:#f4f7f6;
+    margin:0;
+    padding:10px;
+    color:var(--dark);
+}
+
+.container { max-width:100%; margin:auto; padding-bottom:100px; }
+
+.controls {
+    background:white;
+    padding:15px;
+    border-radius:15px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+
+.grid-settings { display:grid; grid-template-columns:1fr; gap:12px; }
+@media (min-width:600px){
+    .grid-settings{ grid-template-columns:1fr 1fr; }
+}
+
+.preview-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px;
+}
+
+.preview-item {
+    background:white;
+    padding:5px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+canvas { width:100%; border-radius:6px; }
+
+label {
+    font-weight:700;
+    font-size:0.75rem;
+    display:block;
+    margin-bottom:5px;
+    text-transform:uppercase;
+}
+
+input,select {
+    width:100%;
+    padding:10px;
+    border:1px solid #dfe6e9;
+    border-radius:8px;
+}
+
+#downloadBtn{
+    background:var(--success);
+    color:white;
+    font-weight:bold;
+    border:none;
+    width:calc(100% - 20px);
+    padding:18px;
+    border-radius:15px;
+    font-size:1.1rem;
+    position:fixed;
+    bottom:15px;
+    left:10px;
+    z-index:1000;
+}
+
+.status{
+    text-align:center;
+    margin-top:10px;
+    font-weight:bold;
+    color:var(--primary);
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <div class="controls">
-        <div class="grid-settings">
-            <div>
-                <label>1. Tải ảnh lên</label>
-                <input type="file" id="upload" accept="image/*" multiple>
-            </div>
-            <div>
-                <label>2. Nhà cung cấp</label>
-                <select id="supplier">
-                    <option value="1A801">lan tùng (1A801)</option>
+<div class="controls">
+<div class="grid-settings">
+
+<div>
+<label>Tải ảnh</label>
+<input type="file" id="upload" accept="image/*" multiple>
+</div>
+
+<div>
+<label>Nhà cung cấp</label>
+<select id="supplier">
+ <option value="1A801">lan tùng (1A801)</option>
                     <option value="1A802">khải kiệt (1A802)</option>
                     <option value="1A803">alan (1A803)</option>
                     <option value="1A804">a chu (1A804)</option>
@@ -74,255 +129,218 @@
                     <option value="1A828">mây trẻ (1A828)</option>
                     <option value="1A829">khải béo (1A829)</option>
                     <option value="1A830">a sinh nam (1A830)</option>
-                </select>
-            </div>
-            <div>
-                <label>3. Màu & Vị trí</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="color" id="textColor" value="#ffffff" style="width: 60px; height: 45px; padding: 2px;">
-                    <select id="textPos">
-                        <option value="bottom-right" selected>Phải - Dưới</option>
-                        <option value="bottom-left">Trái - Dưới</option>
-                        <option value="top-right">Phải - Trên</option>
-                        <option value="top-left">Trái - Trên</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <label>4. Cỡ chữ & Mờ</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="range" id="textSize" min="1" max="25" value="8">
-                    <input type="range" id="textOpacity" min="1" max="10" value="10">
-                </div>
-            </div>
-            <div>
-                <label>5. Mã ghi đè (VD: 35l/37l)</label>
-                <input type="text" id="overrideName" placeholder="Tên file hoặc nhập tay">
-            </div>
-
-            <div class="formula-group">
-                <div><label>Giá NDT</label><input type="number" id="giaTrung" value="3.9" step="0.1"></div>
-                <div><label>Lớn (L)</label><input type="number" id="giaNguoiLon" value="17" step="1"></div>
-                <div><label>Trẻ (B)</label><input type="number" id="giaTreEm" value="15" step="1"></div>
-                <div><label>Phụ phí</label><input type="number" id="extraPrice" value="0" step="1"></div>
-            </div>
-        </div>
-        <div id="status" class="status">Sẵn sàng</div>
-    </div>
-    <div id="previewGrid" class="preview-grid"></div>
+</select>
 </div>
 
-<button id="downloadBtn">XUẤT & CHIA SẺ ZALO/IPHONE</button>
+<div>
+<label>Màu & vị trí</label>
+<div style="display:flex;gap:8px;">
+<input type="color" id="textColor" value="#ffffff" style="width:60px;">
+<select id="textPos">
+<option value="bottom-right">Phải - Dưới</option>
+<option value="bottom-left">Trái - Dưới</option>
+<option value="top-right">Phải - Trên</option>
+<option value="top-left">Trái - Trên</option>
+</select>
+</div>
+</div>
+
+<div>
+<label>Cỡ chữ & mờ</label>
+<div style="display:flex;gap:10px;">
+<input type="range" id="textSize" min="1" max="25" value="8">
+<input type="range" id="textOpacity" min="1" max="10" value="10">
+</div>
+</div>
+
+<div>
+<label>Mã ghi đè</label>
+<input type="text" id="overrideName">
+</div>
+
+</div>
+
+<div id="status" class="status">Sẵn sàng</div>
+</div>
+
+<div id="previewGrid" class="preview-grid"></div>
+</div>
+
+<button id="downloadBtn">XUẤT & CHIA SẺ</button>
 
 <script>
-    const $ = id => document.getElementById(id);
-    const upload = $('upload'), previewGrid = $('previewGrid'), status = $('status'), downloadBtn = $('downloadBtn');
-    
-    // Lưu và nạp lại dữ liệu cũ từ bộ nhớ trình duyệt
-    const fields = ['supplier', 'giaTrung', 'giaNguoiLon', 'giaTreEm', 'extraPrice', 'textPos', 'textColor', 'textSize', 'textOpacity'];
-    fields.forEach(id => {
-        if (localStorage.getItem(id)) $(id).value = localStorage.getItem(id);
-        $(id).addEventListener('input', () => localStorage.setItem(id, $(id).value));
-    });
+const $ = id => document.getElementById(id);
+const upload = $('upload');
+const previewGrid = $('previewGrid');
+const status = $('status');
+const downloadBtn = $('downloadBtn');
 
-    let fileData = [];
+const MAX_WIDTH = 1500;
+const JPEG_QUALITY = 0.75;
+const BATCH_SIZE = 4;
 
-    // Hàm tính toán giá: Xuất ra định dạng ht155/160
-    function calculatePriceString(filename, config) {
-        const source = config.overrideName || filename;
-        const regex = /(\d+)\s*([blBL])/gi; 
-        const matches = [...source.matchAll(regex)];
-        
-        if (matches.length > 0) {
-            const prices = matches.map(match => {
-                const num = parseFloat(match[1]);
-                const type = match[2].toLowerCase();
-                const base = num * config.giaTrung;
-                const added = (type === 'l' ? config.giaNguoiLon : config.giaTreEm);
-                return Math.round(base + added + config.extraPrice);
-            });
-            return "ht" + prices.join('/');
-        }
-        return "";
-    }
+let fileData = [];
 
-    async function renderCanvas(file, canvas) {
-        const img = await loadImage(file);
-        const config = {
-            supplier: $('supplier').value,
-            color: $('textColor').value,
-            sizeRatio: $('textSize').value / 100,
-            pos: $('textPos').value,
-            opacity: $('textOpacity').value / 10,
-            giaTrung: parseFloat($('giaTrung').value) || 0,
-            giaNguoiLon: parseFloat($('giaNguoiLon').value) || 0,
-            giaTreEm: parseFloat($('giaTreEm').value) || 0,
-            extraPrice: parseFloat($('extraPrice').value) || 0,
-            overrideName: $('overrideName').value.trim()
-        };
+/* =========================
+   UTIL
+========================= */
 
-        const pricePart = calculatePriceString(file.name, config);
-        const finalMainText = `${config.supplier}${pricePart}`; 
-
-        canvas.width = img.width; 
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-
-        const fontSize = Math.floor(img.width * config.sizeRatio);
-        ctx.font = `bold ${fontSize}px sans-serif`;
-        ctx.fillStyle = config.color;
-        ctx.globalAlpha = config.opacity;
-        
-        // Đổ bóng đậm giúp nhìn rõ trên ảnh sáng màu
-        ctx.shadowColor = "rgba(0,0,0,0.85)";
-        ctx.shadowBlur = fontSize / 4;
-        ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
-
-        const margin = fontSize * 0.7;
-        ctx.textAlign = config.pos.includes('right') ? 'right' : 'left';
-        ctx.textBaseline = config.pos.includes('bottom') ? 'bottom' : 'top';
-        
-        const x = config.pos.includes('right') ? img.width - margin : margin;
-        const y = config.pos.includes('bottom') ? img.height - margin : margin;
-
-        ctx.fillText(finalMainText, x, y);
-        return { canvas, text: finalMainText };
-    }
-
-    upload.onchange = (e) => {
-        fileData = Array.from(e.target.files);
-        previewGrid.innerHTML = "";
-        if (fileData.length > 0) {
-            fileData.slice(0, 2).forEach((file, i) => {
-                const div = document.createElement('div');
-                div.className = 'preview-item';
-                div.innerHTML = `<canvas id="canvas_${i}"></canvas>`;
-                previewGrid.appendChild(div);
-                renderCanvas(file, $(`canvas_${i}`));
-            });
-            status.innerText = `Đã chọn ${fileData.length} ảnh.`;
-        }
+function debounce(fn,delay=200){
+    let t;
+    return (...a)=>{
+        clearTimeout(t);
+        t=setTimeout(()=>fn(...a),delay);
     };
+}
 
-    // Cập nhật xem trước khi thay đổi bất kỳ ô nhập liệu nào
-    [...fields, 'overrideName'].forEach(id => {
-        $(id).addEventListener('input', () => {
-            if (fileData.length) {
-                fileData.slice(0, 2).forEach((f, i) => {
-                    const canvas = $(`canvas_${i}`);
-                    if (canvas) renderCanvas(f, canvas);
-                });
-            }
-        });
+function loadImage(file){
+    return new Promise(res=>{
+        const img=new Image();
+        img.onload=()=>{
+            URL.revokeObjectURL(img.src);
+            res(img);
+        };
+        img.src=URL.createObjectURL(file);
     });
+}
 
-    downloadBtn.onclick = async () => {
-    if (!fileData.length) {
-        alert("Chưa có ảnh!");
-        return;
+function getConfig(){
+    return {
+        supplier:$('supplier').value,
+        color:$('textColor').value,
+        sizeRatio:$('textSize').value/100,
+        pos:$('textPos').value,
+        opacity:$('textOpacity').value/10,
+        overrideName:$('overrideName').value.trim()
+    };
+}
+
+function calculatePriceString(name){
+    const regex=/(\d+(?:\.\d+)?)\s*([bl])/gi;
+    const matches=[...name.matchAll(regex)];
+    if(!matches.length) return "";
+    return "ht"+matches.map(m=>Math.round(m[1]*3.9)).join("/");
+}
+
+/* =========================
+   RENDER
+========================= */
+
+async function renderCanvas(file,canvas){
+    const img=await loadImage(file);
+    const ctx=canvas.getContext("2d");
+    const config=getConfig();
+
+    let width=img.width;
+    let height=img.height;
+
+    if(width>MAX_WIDTH){
+        const scale=MAX_WIDTH/width;
+        width=MAX_WIDTH;
+        height=height*scale;
     }
 
-    downloadBtn.disabled = true;
-    status.innerText = "⏳ Đang xử lý...";
+    canvas.width=width;
+    canvas.height=height;
 
-    const MAX_WIDTH = 1500;      // giảm tải RAM
-    const JPEG_QUALITY = 0.75;   // giảm dung lượng
-    const BATCH_SIZE = 4;        // Zalo ổn định nhất 3–4 ảnh/lần
+    ctx.drawImage(img,0,0,width,height);
 
-    try {
-        const filesToShare = [];
-        const textLabels = [];
+    const price=calculatePriceString(file.name);
+    const text=config.supplier+price;
 
-        for (let i = 0; i < fileData.length; i++) {
+    const fontSize=Math.floor(width*config.sizeRatio);
+    ctx.font=`bold ${fontSize}px sans-serif`;
+    ctx.fillStyle=config.color;
+    ctx.globalAlpha=config.opacity;
 
-            const tempCanvas = document.createElement("canvas");
-            const result = await renderCanvas(fileData[i], tempCanvas);
+    ctx.shadowColor="rgba(0,0,0,0.8)";
+    ctx.shadowBlur=fontSize/4;
+    ctx.shadowOffsetX=2;
+    ctx.shadowOffsetY=2;
 
-            // Resize lại nếu quá lớn
-            if (tempCanvas.width > MAX_WIDTH) {
-                const scale = MAX_WIDTH / tempCanvas.width;
-                const resizedCanvas = document.createElement("canvas");
-                resizedCanvas.width = MAX_WIDTH;
-                resizedCanvas.height = tempCanvas.height * scale;
+    const margin=fontSize*0.7;
+    ctx.textAlign=config.pos.includes("right")?"right":"left";
+    ctx.textBaseline=config.pos.includes("bottom")?"bottom":"top";
 
-                const rctx = resizedCanvas.getContext("2d");
-                rctx.drawImage(
-                    tempCanvas,
-                    0, 0,
-                    resizedCanvas.width,
-                    resizedCanvas.height
-                );
+    const x=config.pos.includes("right")?width-margin:margin;
+    const y=config.pos.includes("bottom")?height-margin:margin;
 
-                tempCanvas.width = 0;
-                tempCanvas.height = 0;
+    ctx.fillText(text,x,y);
 
-                tempCanvas.width = resizedCanvas.width;
-                tempCanvas.height = resizedCanvas.height;
-                tempCanvas.getContext("2d")
-                    .drawImage(resizedCanvas, 0, 0);
-            }
+    return text;
+}
 
-            const blob = await new Promise(resolve =>
-                tempCanvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY)
-            );
+/* =========================
+   PREVIEW
+========================= */
 
-            if (!blob) {
-                console.warn("Blob null:", i);
-                continue;
-            }
+const updatePreview=debounce(()=>{
+    if(!fileData.length) return;
+    fileData.slice(0,2).forEach((f,i)=>{
+        const canvas=$(`canvas_${i}`);
+        if(canvas) renderCanvas(f,canvas);
+    });
+},200);
 
-            filesToShare.push(
-                new File([blob], `minh_${i + 1}.jpg`, {
-                    type: "image/jpeg"
-                })
-            );
+upload.onchange=e=>{
+    fileData=[...e.target.files];
+    previewGrid.innerHTML="";
+    fileData.slice(0,2).forEach((f,i)=>{
+        const div=document.createElement("div");
+        div.className="preview-item";
+        div.innerHTML=`<canvas id="canvas_${i}"></canvas>`;
+        previewGrid.appendChild(div);
+        renderCanvas(f,$(`canvas_${i}`));
+    });
+    status.innerText=`Đã chọn ${fileData.length} ảnh`;
+};
 
-            textLabels.push(result.text);
+/* =========================
+   SHARE STABLE
+========================= */
 
-            // Clear memory ngay sau khi xong
-            tempCanvas.width = 0;
-            tempCanvas.height = 0;
+downloadBtn.onclick=async()=>{
+    if(!fileData.length) return alert("Chưa có ảnh");
+
+    downloadBtn.disabled=true;
+    status.innerText="⏳ Đang xử lý...";
+
+    try{
+        const files=[];
+
+        for(let i=0;i<fileData.length;i++){
+            const tempCanvas=document.createElement("canvas");
+            await renderCanvas(fileData[i],tempCanvas);
+
+            const blob=await new Promise(r=>tempCanvas.toBlob(r,"image/jpeg",JPEG_QUALITY));
+            if(!blob) continue;
+
+            files.push(new File([blob],`minh_${i+1}.jpg`,{type:"image/jpeg"}));
+
+            tempCanvas.width=0;
+            tempCanvas.height=0;
         }
 
-        if (!filesToShare.length) {
-            throw new Error("Không tạo được file nào.");
-        }
-
-        // ===== SHARE THEO BATCH =====
-        if (navigator.canShare) {
-
-            for (let i = 0; i < filesToShare.length; i += BATCH_SIZE) {
-
-                const batch = filesToShare.slice(i, i + BATCH_SIZE);
-
-                if (!navigator.canShare({ files: batch })) {
-                    console.warn("Batch không share được:", batch);
-                    continue;
+        if(navigator.canShare){
+            for(let i=0;i<files.length;i+=BATCH_SIZE){
+                const batch=files.slice(i,i+BATCH_SIZE);
+                if(navigator.canShare({files:batch})){
+                    await navigator.share({files:batch});
+                    await new Promise(r=>setTimeout(r,300));
                 }
-
-                await navigator.share({
-                    files: batch,
-                    text: [...new Set(textLabels)].join("\n")
-                });
-
-                // Delay nhẹ để tránh crash iOS
-                await new Promise(r => setTimeout(r, 300));
             }
-
-            status.innerText = "✅ Hoàn tất!";
-        } else {
-            status.innerText = "⚠️ Trình duyệt không hỗ trợ Share API.";
+            status.innerText="✅ Hoàn tất!";
+        }else{
+            status.innerText="⚠️ Không hỗ trợ Share API";
         }
 
-    } catch (err) {
-        console.error(err);
-        status.innerText = "❌ Đã hủy hoặc gặp lỗi.";
+    }catch(e){
+        status.innerText="❌ Lỗi hoặc đã hủy";
     }
 
-    downloadBtn.disabled = false;
+    downloadBtn.disabled=false;
 };
 </script>
+
 </body>
 </html>
-
